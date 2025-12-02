@@ -219,68 +219,86 @@ public class MeuPlantario {
             default:
                 filtroTipo = "sol";
         }
-
-        abreArqLeitura();
         exibeListaPlantas(filtroTipo);
-        fechaArqLeit();
     }
 
     public static void exibeListaPlantas(String filtro) {
+        abreArqLeitura();
+
+        if (arqEnt == null) {
+            System.out.println("Arquivo plantas.txt não encontrado.");
+            return;
+        }
+
         try {
             int contador = 0;
-            boolean encontrou = false;
+            String[] linhasTemp = new String[100];
+            int totalLinhas = 0;
 
-            System.out.println("\n=====================================================");
-            if (filtro.equals("t0das")) {
-                System.out.println("LISTAGEM DE TODAS AS PLANTAS");
-            } else {
-                System.out.println("LISTAGEM DE PLANTAS DE " + filtro.toUpperCase());
-            }
-            System.out.println("\n=====================================================");
-            System.out.printf("%-15s %-15s %-12s %-15s %-12s %-20s%n",
-                    "Nome", "Tipo", "Rega(dias)", "Adubo(dias)", "Tipo Rega", "Tipo Adubo");
-            System.out.println("\n-----------------------------------------------------");
-            while (arqEnt.hasNext()) {
-                String linha = arqEnt.nextLine();
-
-                String[] dados = linha.split(";");
-
-                if (dados.length >= 6) {
-                    String nome = dados[0];
-                    String tipoPlanta = dados[1];
-                    int intervaloRega = Integer.parseInt(dados[2]);
-                    int intervaloAdubo = Integer.parseInt(dados[3]);
-                    String tipoRega = dados[4];
-                    String tipoAdubo = dados[5];
-
-                    if (filtro.equals("todas") || tipoPlanta.equals(filtro)) {
-                        System.out.printf("%-15s %-15s %-12d %-15d %-12s %-20s%n",
-                                nome, tipoPlanta, intervaloRega, intervaloAdubo,
-                                tipoRega, tipoAdubo);
-                        contador++;
-                        encontrou = true;
+            // Primeiro lê todas as linhas válidas
+            while (arqEnt.hasNextLine() && totalLinhas < 100) {
+                String linha = arqEnt.nextLine(). trim();
+                if (!linha.isEmpty()) {
+                    String[] dados = linha.split(";");
+                    if (dados.length >= 6) {
+                        if (filtro.equals("todas") || dados[1].equals(filtro)) {
+                            linhasTemp[totalLinhas] = linha;
+                            totalLinhas++;
+                        }
                     }
                 }
             }
 
-            System.out.println("\n-----------------------------------------------------");
-
-            if (!encontrou) {
+            // Se não encontrou nenhuma, só mostra mensagem e sai
+            if (totalLinhas == 0) {
+                System.out.println("\n=====================================================");
                 if (filtro.equals("todas")) {
                     System.out.println("Nenhuma planta cadastrada ainda.");
                 } else {
-                    System.out.printf("\nNenhuma planta do tipo '%s' encontrada\n", filtro);
+                    System.out.printf("Nenhuma planta do tipo '%s' encontrada.\n", filtro);
                 }
-            } else {
-                System.out.println("Total de plantas listadas: " + contador);
+                System.out.println("=====================================================");
+                return;
             }
+
+            // Se encontrou, mostra cabeçalho e lista
             System.out.println("\n=====================================================");
+            if (filtro.equals("todas")) {
+                System.out.println("LISTAGEM DE TODAS AS PLANTAS");
+            } else {
+                System.out.println("LISTAGEM DE PLANTAS DE " + filtro.toUpperCase());
+            }
+            System.out.println("=====================================================");
+            System.out.printf("%-15s %-15s %-12s %-15s %-12s %-20s%n",
+                    "Nome", "Tipo", "Rega(dias)", "Adubo(dias)", "Tipo Rega", "Tipo Adubo");
+            System. out.println("-----------------------------------------------------");
+
+            for (int i = 0; i < totalLinhas; i++) {
+                String[] dados = linhasTemp[i].split(";");
+                String nome = dados[0];
+                String tipoPlanta = dados[1];
+                int intervaloRega = Integer.parseInt(dados[2]);
+                int intervaloAdubo = Integer.parseInt(dados[3]);
+                String tipoRega = dados[4];
+                String tipoAdubo = dados[5];
+
+                System.out.printf("%-15s %-15s %-12d %-15d %-12s %-20s%n",
+                        nome, tipoPlanta, intervaloRega, intervaloAdubo,
+                        tipoRega, tipoAdubo);
+            }
+
+            System.out.println("-----------------------------------------------------");
+            System.out. println("Total de plantas listadas: " + totalLinhas);
+            System.out.println("=====================================================");
+
         } catch (NoSuchElementException elementException) {
-            System. err.println("Erro ao ler os dados do arquivo.");
+            System.err.println("Erro ao ler os dados do arquivo.");
         } catch (IllegalStateException stateException) {
-            System.err.println("Erro na leitura do arquivo.");
+            System. err.println("Erro na leitura do arquivo.");
         } catch (NumberFormatException numberException) {
             System.err. println("Arquivo com formato incorreto.");
+        } finally {
+            fechaArqLeit();
         }
     }
 
@@ -308,6 +326,10 @@ public class MeuPlantario {
             String[] p = linhas[i].split(";");
             System.out.println((i + 1) + " - " + p[0]);
         }
+
+        abreArqLeitura();
+
+        exibeListaPlantas("todas");
 
         System.out.println("Digite o nome da planta para remover: ");
         String nome = scRemove.nextLine();

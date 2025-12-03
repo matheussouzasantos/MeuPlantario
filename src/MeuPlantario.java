@@ -21,7 +21,7 @@ public class MeuPlantario {
             // leRegistro();
             // fechaArqLeit();
             abreArqEscrita();
-            System.out.println("\n=== Meu Plantário ===");
+            System.out.println("\n===== Meu Plantário =====");
             System.out.println("1 - Cadastro de Plantas");
             System.out.println("2 - Listar Plantas");
             System.out.println("3 - Remover Plantas");
@@ -143,7 +143,7 @@ public class MeuPlantario {
                 intervaloRega = scCadastro.nextInt();
             }
 
-            System.out.print("Digite o intervalo de adubagem (dias): ");
+            System.out.print("Digite o intervalo de adubagem em dias: ");
             intervaloAdubo = scCadastro.nextInt();
             while (intervaloAdubo <= 0) {
                 System.out.print("Intervalo inválido. Digite um número positivo: ");
@@ -224,80 +224,78 @@ public class MeuPlantario {
 
     public static void exibeListaPlantas(String filtro) {
         abreArqLeitura();
-
         if (arqEnt == null) {
             System.out.println("Arquivo plantas.txt não encontrado.");
             return;
-        }
+        } else {
+            try {
+                int contador = 0;
+                String[] linhasTemp = new String[100];
+                int totalLinhas = 0;
 
-        try {
-            int contador = 0;
-            String[] linhasTemp = new String[100];
-            int totalLinhas = 0;
-
-            // Primeiro lê todas as linhas válidas
-            while (arqEnt.hasNextLine() && totalLinhas < 100) {
-                String linha = arqEnt.nextLine(). trim();
-                if (!linha.isEmpty()) {
-                    String[] dados = linha.split(";");
-                    if (dados.length >= 6) {
-                        if (filtro.equals("todas") || dados[1].equals(filtro)) {
-                            linhasTemp[totalLinhas] = linha;
-                            totalLinhas++;
+                // Primeiro lê todas as linhas válidas
+                while (arqEnt.hasNextLine() && totalLinhas < 100) {
+                    String linha = arqEnt.nextLine(). trim();
+                    if (!linha.isEmpty()) {
+                        String[] dados = linha.split(";");
+                        if (dados.length >= 6) {
+                            if (filtro.equals("todas") || dados[1].equals(filtro)) {
+                                linhasTemp[totalLinhas] = linha;
+                                totalLinhas++;
+                            }
                         }
                     }
                 }
-            }
 
-            // Se não encontrou nenhuma, só mostra mensagem e sai
-            if (totalLinhas == 0) {
+                // Se não encontrou nenhuma, só mostra mensagem e sai
+                if (totalLinhas == 0) {
+                    System.out.println("\n=====================================================");
+                    if (filtro.equals("todas")) {
+                        System.out.println("Nenhuma planta cadastrada ainda.");
+                    } else {
+                        System.out.printf("Nenhuma planta do tipo '%s' encontrada.\n", filtro);
+                    }
+                    System.out.println("=====================================================");
+                    return;
+                }
+
+                // Se encontrou, mostra cabeçalho e lista
                 System.out.println("\n=====================================================");
                 if (filtro.equals("todas")) {
-                    System.out.println("Nenhuma planta cadastrada ainda.");
+                    System.out.println("LISTAGEM DE TODAS AS PLANTAS");
                 } else {
-                    System.out.printf("Nenhuma planta do tipo '%s' encontrada.\n", filtro);
+                    System.out.println("LISTAGEM DE PLANTAS DE " + filtro.toUpperCase());
                 }
-                System.out.println("=====================================================");
-                return;
+                System.out.println("==========================================================================================================");
+                System.out.printf("%-22s %-15s %-12s %-15s %-12s %-20s%n",
+                        "Nome", "Tipo", "Rega(dias)", "Adubo(dias)", "Tipo Rega", "Tipo Adubo");
+                System. out.println("----------------------------------------------------------------------------------------------------------");
+
+                for (int i = 0; i < totalLinhas; i++) {
+                    String[] dados = linhasTemp[i].split(";");
+                    String nome = dados[0];
+                    String tipoPlanta = dados[1];
+                    int intervaloRega = Integer.parseInt(dados[2]);
+                    int intervaloAdubo = Integer.parseInt(dados[3]);
+                    String tipoRega = dados[4];
+                    String tipoAdubo = dados[5];
+
+                    System.out.printf("%-22s %-15s %-12d %-15d %-12s %-20s%n",
+                            nome, tipoPlanta, intervaloRega, intervaloAdubo,
+                            tipoRega, tipoAdubo);
+                }
+
+                System.out.println("----------------------------------------------------------------------------------------------------------");
+                System.out. println("Total de plantas listadas: " + totalLinhas);
+                System.out.println("==========================================================================================================");
+
+            } catch (NoSuchElementException elementException) {
+                System.err.println("Erro ao ler os dados do arquivo.");
+            } catch (IllegalStateException stateException) {
+                System. err.println("Erro na leitura do arquivo.");
+            } catch (NumberFormatException numberException) {
+                System.err. println("Arquivo com formato incorreto.");
             }
-
-            // Se encontrou, mostra cabeçalho e lista
-            System.out.println("\n=====================================================");
-            if (filtro.equals("todas")) {
-                System.out.println("LISTAGEM DE TODAS AS PLANTAS");
-            } else {
-                System.out.println("LISTAGEM DE PLANTAS DE " + filtro.toUpperCase());
-            }
-            System.out.println("=====================================================");
-            System.out.printf("%-15s %-15s %-12s %-15s %-12s %-20s%n",
-                    "Nome", "Tipo", "Rega(dias)", "Adubo(dias)", "Tipo Rega", "Tipo Adubo");
-            System. out.println("-----------------------------------------------------");
-
-            for (int i = 0; i < totalLinhas; i++) {
-                String[] dados = linhasTemp[i].split(";");
-                String nome = dados[0];
-                String tipoPlanta = dados[1];
-                int intervaloRega = Integer.parseInt(dados[2]);
-                int intervaloAdubo = Integer.parseInt(dados[3]);
-                String tipoRega = dados[4];
-                String tipoAdubo = dados[5];
-
-                System.out.printf("%-15s %-15s %-12d %-15d %-12s %-20s%n",
-                        nome, tipoPlanta, intervaloRega, intervaloAdubo,
-                        tipoRega, tipoAdubo);
-            }
-
-            System.out.println("-----------------------------------------------------");
-            System.out. println("Total de plantas listadas: " + totalLinhas);
-            System.out.println("=====================================================");
-
-        } catch (NoSuchElementException elementException) {
-            System.err.println("Erro ao ler os dados do arquivo.");
-        } catch (IllegalStateException stateException) {
-            System. err.println("Erro na leitura do arquivo.");
-        } catch (NumberFormatException numberException) {
-            System.err. println("Arquivo com formato incorreto.");
-        } finally {
             fechaArqLeit();
         }
     }
@@ -309,8 +307,7 @@ public class MeuPlantario {
         boolean encontrou = false;
 
         abreArqLeitura();
-
-        while (arqEnt.hasNextLine() && total < 100) {
+        while (arqEnt.hasNextLine()) {
             linhas[total] = arqEnt.nextLine();
             total++;
         }
@@ -318,44 +315,39 @@ public class MeuPlantario {
 
         if (total == 0) {
             System.out.println("Nenhuma planta cadastrada.");
-            return;
-        }
-
-        System.out.println("Plantas cadastradas: ");
-        for (int i = 0; i < total; i++) {
-            String[] p = linhas[i].split(";");
-            System.out.println((i + 1) + " - " + p[0]);
-        }
-
-        abreArqLeitura();
-
-        exibeListaPlantas("todas");
-
-        System.out.println("Digite o nome da planta para remover: ");
-        String nome = scRemove.nextLine();
-
-        try {
-            Formatter arqNovo = new Formatter("plantas.txt");
+        } else {
+            System.out.println("Plantas cadastradas: ");
             for (int i = 0; i < total; i++) {
                 String[] p = linhas[i].split(";");
-                if (p[0].equalsIgnoreCase(nome) && !encontrou) {
-                    System.out.println("Planta '" + p[0] + "' removida!");
-                    encontrou = true;
-                } else {
-                    arqNovo.format("%s%n", linhas[i]);
-                }
+                System.out.println((i + 1) + " - " + p[0]);
             }
-            arqNovo.close();
 
-            if (!encontrou) {
-                System.out.println("Planta não encontrada.");
+            System.out.println("Digite o nome da planta para remover: ");
+            String nome = scRemove.nextLine();
+
+            try {
+                Formatter arqNovo = new Formatter("plantas.txt");
+                for (int i = 0; i < total; i++) {
+                    String[] p = linhas[i].split(";");
+                    if (p[0].equalsIgnoreCase(nome) && !encontrou) {
+                        System.out.println("Planta '" + p[0] + "' removida!");
+                        encontrou = true;
+                    } else {
+                        arqNovo.format("%s%n", linhas[i]);
+                    }
+                }
+                arqNovo.close();
+
+                if (!encontrou) {
+                    System.out.println("Planta não encontrada.");
+                }
+            } catch (SecurityException securityException) {
+                System.err.println("Permissão de Escrita Negada.  Fechando.. .");
+            } catch (FileNotFoundException fileNotFoundException) {
+                System.err.println("Erro ao abrir o arquivo para escrita.");
+            } catch (FormatterClosedException formatterClosedException) {
+                System.err.println("Erro de escrita no arquivo.");
             }
-        } catch (SecurityException securityException) {
-            System.err.println("Permissão de Escrita Negada.  Fechando.. .");
-        } catch (FileNotFoundException fileNotFoundException) {
-            System.err.println("Erro ao abrir o arquivo para escrita.");
-        } catch (FormatterClosedException formatterClosedException) {
-            System.err.println("Erro de escrita no arquivo.");
         }
     }
 
@@ -365,29 +357,22 @@ public class MeuPlantario {
         String nomeBusca;
         int total = 0;
         boolean encontrado = false;
-
-        leRegistro();
     }
 
-    public static void leRegistro() {
-        try {
-            System.out.printf("%-12s %-12s %-14s %-6s%n", "Nome", "Rega(dias)", "Aduba(dias)", "Tipo");
-            while (arqEnt.hasNext()) {
-                String nome = arqEnt.next();
-                int reg = arqEnt.nextInt();
-                int adu = arqEnt.nextInt();
-                int tipo = arqEnt.nextInt();
+    public static void regaPlanta() {
 
-                System.out.printf("%-12s %-12d %-14d %-6d%n", nome, reg, adu, tipo);
-            }
-        } catch (NoSuchElementException elementException) {
-            System.err.println("Arquivo corrompido.");
-            arqEnt.close();
-            System.exit(1);
-        } catch (IllegalStateException stateException) {
-            System.err.println("Erro na leitura do arquivo.");
-            System.exit(1);
-        }
+    }
+
+    public static void adubaPlanta() {
+
+    }
+
+    public static void abreLembrete() {
+
+    }
+
+    public static void sugerePlantas() {
+
     }
 
     public static void fechaArqEsc() {

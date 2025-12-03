@@ -1,1 +1,10 @@
-Bromélia;meia-sombra;2;30;media;Húmus;
+Cacto;sol;14;0;baixa;nenhum;
+Gerânio;sol;7;30;media;NPK;
+Mini-rosa;sol;3;30;alta;NPK;
+Bromélia;meia-sombra;7;30;media;Húmus;
+Violeta-africana;meia-sombra;3;30;media;Pó-de-banana;
+Orquídea Phalaenopsis;meia-sombra;7;60;media;Musgo;
+Peperômia;sombra;10;60;baixa;Composto;
+Espada-de-São-Jorge;meia-sombra;14;180;baixa;Composto;
+Samambaia;meia-sombra;3;30;alta;Húmus;
+Monstera deliciosa;meia-sombra;7;60;media;NPK;
